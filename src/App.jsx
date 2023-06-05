@@ -7,7 +7,7 @@ const App = () => {
 
 	useEffect(() => {
 		const fetchTodos = async () => {
-			const response = await axios.get("http://localhost:3200/api/todos");
+			const response = await axios.get("https://todolist-online-lw2j.onrender.com:3200/api/todos");
 			setTodoList(response.data);
 		};
 		fetchTodos();
@@ -25,7 +25,7 @@ const App = () => {
 
 	const notifyTodoAdded = async (newTodo) => {
 		try {
-			const response = await axios.post("http://localhost:3200/api/todos", {
+			const response = await axios.post("https://todolist-online-lw2j.onrender.com:3200/api/todos", {
 				title: newTodo.title,
 				status: newTodo.status,
 			});
@@ -36,7 +36,7 @@ const App = () => {
 	};
 	const notifyTodoComplete = async (id) => {
 		try {
-			const response = await axios.patch(`http://localhost:3200/api/todos/${id}?status=true`);
+			const response = await axios.patch(`https://todolist-online-lw2j.onrender.com:3200/api/todos/${id}?status=true`);
 			setTodoList(response.data);
 		} catch (error) {
 			console.log(error);
@@ -44,7 +44,7 @@ const App = () => {
 	};
 	const notifyTodoDeleted = async (id) => {
 		try {
-			const response = await axios.delete(`http://localhost:3200/api/todos/${id}`);
+			const response = await axios.delete(`https://todolist-online-lw2j.onrender.com:3200/api/todos/${id}`);
 			setTodoList(response.data);
 		} catch (error) {
 			console.log(error);
