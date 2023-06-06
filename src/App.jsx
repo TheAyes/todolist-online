@@ -54,7 +54,7 @@ const App = () => {
 
 	return (
 		<div className="App">
-			<h1>Todo App Lite</h1>
+			<h1>Todo App</h1>
 			<form onSubmit={handleSubmit}>
 				<input type="text" id="addTodoField"/>
 			</form>
