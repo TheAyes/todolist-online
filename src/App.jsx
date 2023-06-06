@@ -36,7 +36,8 @@ const App = () => {
 	};
 	const notifyTodoComplete = async (id) => {
 		try {
-			const response = await axios.patch(`https://todolist-online-lw2j.onrender.com/api/todos/${id}?status=true`);
+			const foundItem = todoList.find((item) => item._id === id);
+			const response = await axios.patch(`https://todolist-online-lw2j.onrender.com/api/todos/${id}?status=${!foundItem.status}`);
 			setTodoList(response.data);
 		} catch (error) {
 			console.log(error);
@@ -69,9 +70,7 @@ const App = () => {
 									}}
 									checked={item.status}
 								/>
-								<h3
-
-								>
+								<h3>
 									{item.title}
 								</h3>
 							</article>
