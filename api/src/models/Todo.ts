@@ -8,6 +8,10 @@ const TodoSchema = new mongoose.Schema({
 	status: {
 		type: Boolean,
 		required: false,
+	},
+	authToken: {
+		type: String,
+		required: true
 	}
 });
 
