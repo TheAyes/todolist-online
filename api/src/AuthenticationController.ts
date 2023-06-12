@@ -1,86 +1,118 @@
 import {User} from './models/User.ts';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import {NextFunction, Request, Response} from 'express';
+import {authenticate, generateToken} from "jwt-authorize";
+import * as process from "process";
 
 declare global {
 	namespace Express {
+
 		interface Request {
 			user?: any;
 		}
 	}
 }
 
-interface UserPayload {
-	username: string;
-	passwordHash: string;
-}
-
-export const generateToken = (username: string, passwordHash: string): string => {
-	return jwt.sign({username, passwordHash}, process.env.JWT_SECRET!, {expiresIn: '24h'});
-};
-
-export const authenticateToken = (req: Request, res: Response, next: NextFunction): void | Response => {
+export const authenticateUser = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
 	const authHeader = req.headers['authorization'];
 	const token = authHeader && authHeader.split(' ')[1];
+
 
 	if (!token) {
 		return res.status(401).json({error: 'Unauthorized'});
 	}
 
-	if (!process.env.JWT_SECRET) {
-		return res.status(500).json({error: 'Internal server error'});
-	}
+	const authResult = authenticate({
+		accessToken: token,
+	}, process.env.JWT_SECRET!);
 
-	jwt.verify(token, process.env.JWT_SECRET, (err: any, user: any) => {
-		if (err) {
-			return res.status(403).json({error: 'Forbidden'});
-		}
-
-		req.user = user;
+	if (authResult.isAuthenticated) {
+		req.user = await User.findById(authResult.payload?.userid).exec();
 		next();
-	});
+	} else {
+		return res.status(authResult.status!).json({error: authResult.error});
+	}
 };
 
-export const doesUserExist = async (username: string = '', password: string = ''): Promise<boolean> => {
-	if (!username || !password) {
-		throw new Error('Username and password are required');
-	}
-
+export const doesUserExist = async (username: string = ''): Promise<boolean> => {
 	const foundUser = await User.findOne({username}).exec();
 
 	return !!foundUser;
 };
 
-export const handleUserRegistration = async (username: string, password: string) => {
+// Modified handleUserRegistration function to generate refresh tokens
+export const handleUserRegistration = async (req: Request, res: Response) => {
+	const {username, password} = req.body;
+	const lowerCaseUsername = username.toLowerCase();
 	try {
-		if (await doesUserExist(username, password)) {
-			return {token: null, user: null, error: 'User already exists'};
+		if (await doesUserExist(lowerCaseUsername)) {
+			return res.status(409).json({
+				accessToken: null,
+				refreshToken: null,
+				error: 'User already exists'
+			});
 		}
 
 		const userSalt = await bcrypt.genSalt();
 		const hashedPassword = await bcrypt.hash(password, userSalt);
 
 		const user = new User({
-			username,
+			lowerCaseUsername,
 			password: hashedPassword,
-			salt: userSalt
 		});
 
-		await user.save();
+		const savedUser = await user.save();
 
-		const token = generateToken(username, user.password);
+		const result = generateToken(
+			{payload: {userid: savedUser._id}, secret: process.env.JWT_SECRET!, options: {expiresIn: '15m'}},
+			{payload: {userid: savedUser._id}, secret: process.env.JWT_REFRESH_SECRET!, options: {expiresIn: '7d'}}
+		);
 
-		return {token, user, error: null};
+		return res.status(201).json({
+			accessToken: result.accessToken,
+			refreshToken: result.refreshToken,
+			error: null
+		});
 	} catch (err: any) {
-		return {token: null, user: null, error: err.message};
+		return res.status(500).json({accessToken: null, refreshToken: null, user: null, error: err.message});
 	}
 };
 
-export const handleUserLogin = async (username: string, password: string) => {
+
+export const handleUserLogin = async (req: Request, res: Response) => {
+	const {username, password} = req.body;
 	try {
-		// login logic here
+		const foundUser = await User.findOne({username}).exec();
+		if (!foundUser) {
+			return res.status(401).json({
+				accessToken: null,
+				refreshToken: null,
+				error: 'Invalid username or password'
+			});
+		}
+
+		const isPasswordCorrect = await bcrypt.compare(password, foundUser.password);
+		if (!isPasswordCorrect) {
+			return res.status(401).json({
+				accessToken: null,
+				refreshToken: null,
+				user: null,
+				error: 'Invalid username or password'
+			});
+		}
+
+		const result = generateToken(
+			{payload: {userid: foundUser._id}, secret: process.env.JWT_SECRET!, options: {expiresIn: '15m'}},
+			{payload: {userid: foundUser._id}, secret: process.env.JWT_REFRESH_SECRET!, options: {expiresIn: '7d'}}
+		);
+
+		return res.status(200).json({
+			accessToken: result.accessToken,
+			refreshToken: result.refreshToken,
+			error: null
+		});
+
 	} catch (err: any) {
-		return {token: null, user: null, error: err.message};
+		return {accessToken: null, refreshToken: null, user: null, error: err.message};
 	}
 };

@@ -1,36 +1,14 @@
 import {Request, Response} from "express";
-import {IUser, User} from "./models/User.js";
+import {v4 as uuid} from 'uuid';
 
-const getUser = async (req: Request, res: Response) => {
-	try {
-		const {user} = req;
-
-		if (!user) {
-			res.status(401).json({error: 'Unauthorized'});
-			return;
-		}
-
-		const foundUser = await User.findOne<IUser>({username: user.username}).exec();
-
-		if (!foundUser) {
-			res.status(404).json({error: 'User not found'});
-			return;
-		}
-
-		return user
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-};
 
 export const getAllTodos = async (req: Request, res: Response) => {
-	const user = await getUser(req, res);
-
+	const {user} = req;
 	res.json(user.todos);
 }
 
 export const getOneTodo = async (req: Request, res: Response) => {
-	const user = await getUser(req, res);
+	const {user} = req;
 
 	res.json(user.todos.filter((id: Number) => {
 		return id === Number(req.params.id);
@@ -38,18 +16,18 @@ export const getOneTodo = async (req: Request, res: Response) => {
 }
 
 export const createTodo = async (req: Request, res: Response) => {
-	const user = await getUser(req, res);
+	const {user} = req;
 
-	const {title, description} = req.body;
+	const {title} = req.body;
 
-	if (!title || !description) {
+	if (!title) {
 		res.status(400).json({error: 'Title and description are required'});
 		return;
 	}
 
 	const todo = {
+		id: uuid(),
 		title,
-		description,
 		status: false
 	};
 
@@ -57,11 +35,11 @@ export const createTodo = async (req: Request, res: Response) => {
 
 	await user.save();
 
-	res.json(user.todos);
+	res.json(todo);
 }
 
 export const updateTodo = async (req: Request, res: Response) => {
-	const user = await getUser(req, res);
+	const {user} = req;
 
 	const {id} = req.params;
 	const {status} = req.query;
@@ -72,7 +50,7 @@ export const updateTodo = async (req: Request, res: Response) => {
 	}
 
 	const todo = user.todos.find((todo: any) => {
-		return todo._id === id;
+		return todo.id === id;
 	});
 
 	if (!todo) {
@@ -87,12 +65,12 @@ export const updateTodo = async (req: Request, res: Response) => {
 }
 
 export const deleteTodo = async (req: Request, res: Response) => {
-	const user = await getUser(req, res);
+	const {user} = req;
 
 	const {id} = req.params;
 
 	const todoIndex = user.todos.findIndex((todo: any) => {
-		return todo._id === id;
+		return todo.id === id;
 	});
 
 	if (todoIndex === -1) {

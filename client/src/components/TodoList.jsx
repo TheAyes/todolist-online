@@ -5,18 +5,26 @@ import axios from "axios";
 const TodoList = () => {
 	const [todos, setTodos] = useState([]);
 	const [inputValue, setInputValue] = useState("");
+	const [userToken, setUserToken] = useState("");
+
+	useEffect(() => {
+		const userToken = JSON.parse(localStorage.getItem("userToken"));
+		setUserToken(userToken);
+	}, [])
 
 	const fetchTodos = useCallback(async () => {
+		const userToken = JSON.parse(localStorage.getItem("userToken"));
 		const response = await axios.get("/api/todos", {
 			headers: {
-				Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+				Authorization: `Bearer ${userToken.accessToken}`,
 			}
 		});
+
 		setTodos(response.data);
 	}, []);
 
 	useEffect(() => {
-		fetchTodos().then(r => r);
+		fetchTodos()
 	}, [fetchTodos]);
 
 	const handleSubmit = async (event) => {
@@ -26,7 +34,7 @@ const TodoList = () => {
 			title: inputValue,
 			status: false,
 		});
-		if (!error) setInputValue("");
+		if (!error) return setInputValue("");
 		window.alert(error);
 	};
 
@@ -38,7 +46,7 @@ const TodoList = () => {
 				status: newTodo.status,
 			}, {
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+					Authorization: `Bearer ${userToken.accessToken}`,
 				}
 			});
 			setTodos(prevTodos => [...prevTodos, response.data]);
@@ -51,11 +59,11 @@ const TodoList = () => {
 
 	const requestComplete = useCallback(async (id) => {
 		try {
-			const foundIndex = todos.findIndex((item) => item._id === id);
+			const foundIndex = todos.findIndex((item) => item.id === id);
 
 			const response = await axios.patch(`/api/todos/${id}?status=${!todos[foundIndex].status}`, null, {
 				headers: {
-					Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+					Authorization: `Bearer ${userToken.accessToken}`,
 				}
 			});
 
@@ -74,11 +82,11 @@ const TodoList = () => {
 		try {
 			const response = await axios.delete(`/api/todos/${id}`, {
 				headers: {
-					authToken: localStorage.getItem("userToken"),
+					Authorization: `Bearer ${userToken.accessToken}`,
 				}
 			});
 			if (response.status === 200) {
-				const updatedTodos = todos.filter(todo => todo._id !== id);
+				const updatedTodos = todos.filter(todo => todo.id !== id);
 				setTodos(updatedTodos);
 			}
 			return {data: response.data, error: null}
@@ -100,8 +108,8 @@ const TodoList = () => {
 			<ul>
 				{todos.map((todo) => {
 					return <TodoItem
-						key={todo._id}
-						propId={todo._id}
+						key={todo.id}
+						propId={todo.id}
 						propStatus={todo.status}
 						propTitle={todo.title}
 						propComplete={requestComplete}

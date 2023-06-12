@@ -1,190 +1,57 @@
 import express, {Express, Request, Response} from 'express';
-import {join} from 'path';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import {Todo} from './models/Todo.ts';
-import {User} from './models/User.ts';
+import path, {dirname, join} from 'path';
 import {config} from 'dotenv';
+import {createTodo, deleteTodo, getAllTodos, getOneTodo, updateTodo} from "./TodoController.ts";
+import * as process from "process";
+import {authenticateUser, handleUserLogin, handleUserRegistration} from "./AuthenticationController.ts";
+import {fileURLToPath} from "url";
+import mongoose from "mongoose";
 
 config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const port = process.env.API_PORT || 3000;
 
-app.use(express.static(join(__dirname, '../../dist')));
+app.use(express.static(join(__dirname, '../../client/dist')));
+app.use(express.json());
 
-const authenticate = async (req: Request, res: Response): Promise<void> => {
-	try {
-		const authToken = req.headers.authorization;
+await mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@${process.env.MONGO_CLUSTER}.mongodb.net/?retryWrites=true&w=majority`)
 
-		if (!authToken) {
-			res.status(401).json({error: 'Authentication token is required'});
-			return;
-		}
-
-		jwt.verify(authToken, process.env.JWT_SECRET as string);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-};
-
-app.get('/', (req: Request, res: Response) => {
-	res.sendFile(new URL('../../dist/index.html', import.meta.url).pathname);
+app.get('/api/todos', authenticateUser, async (req: Request, res: Response) => {
+	await getAllTodos(req, res);
 });
 
-app.get('/api/todos', authenticate, async (req: Request, res: Response) => {
-	try {
-		const todos = await Todo.find();
-		res.json(todos);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
+app.get('/api/todos/:id', authenticateUser, async (req: Request, res: Response) => {
+	await getOneTodo(req, res);
 });
 
-app.get('/api/todos/:id', authenticate, async (req: Request, res: Response) => {
-	try {
-		const todo = await Todo.findById(req.params.id);
-
-		if (todo) {
-			res.json(todo);
-		} else {
-			res.status(404).json({error: 'Todo not found'});
-		}
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
+app.post('/api/todos', authenticateUser, async (req: Request, res: Response) => {
+	await createTodo(req, res);
 });
 
-app.post('/api/todos', authenticate, async (req: Request, res: Response) => {
-	try {
-		const {title} = req.body;
-
-		if (!title) {
-			res.status(400).json({error: 'Title is required'});
-			return;
-		}
-
-		const todo = new Todo({
-			title,
-			status: false,
-		});
-
-		await todo.save();
-		res.status(201).json(todo);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
+app.patch('/api/todos/:id', authenticateUser, async (req: Request, res: Response) => {
+	await updateTodo(req, res);
 });
 
-app.patch('/api/todos/:id', authenticate, async (req: Request, res: Response) => {
-	try {
-		const {id} = req.params;
-		const {status} = req.query;
-
-		if (status === undefined) {
-			res.status(400).json({error: 'Status is required'});
-			return;
-		}
-
-		const todo = await Todo.findById(id);
-
-		if (!todo) {
-			res.status(404).json({error: 'Todo not found'});
-			return;
-		}
-
-		todo.status = status === 'true';
-		await todo.save();
-
-		res.json(todo);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
-
-app.delete('/api/todos/:id', authenticate, async (req: Request, res: Response) => {
-	try {
-		const {id} = req.params;
-
-		const todo = await Todo.findById(id);
-
-		if (!todo) {
-			res.status(404).json({error: 'Todo not found'});
-			return;
-		}
-
-		await Todo.deleteOne({_id: id});
-
-		res.json({message: 'Todo deleted successfully'});
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
+app.delete('/api/todos/:id', authenticateUser, async (req: Request, res: Response) => {
+	await deleteTodo(req, res);
 });
 
 app.post('/api/login', async (req: Request, res: Response) => {
-	try {
-		const {username, password} = req.body;
+	await handleUserLogin(req, res);
 
-		if (!username || !password) {
-			res.status(400).json({error: 'Username and password are required'});
-			return;
-		}
-
-		const user = await User.findOne({username});
-
-		if (!user) {
-			res.status(400).json({error: 'Invalid username or password'});
-			return;
-		}
-
-		const isValidPassword = await bcrypt.compare(password, user.password);
-		if (!isValidPassword) {
-			res.status(400).json({error: 'Invalid username or password'});
-			return;
-		}
-
-		const token = jwt.sign(
-			{username, passwordHash: user.password},
-			process.env.JWT_SECRET as string,
-			{expiresIn: '2h'}
-		);
-
-		res.status(200).json({token});
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
 });
 
 app.post('/api/register', async (req: Request, res: Response) => {
-	try {
-		const {username, password} = req.body;
+	await handleUserRegistration(req, res);
+});
 
-		if (!username || !password) {
-			res.status(400).json({error: 'Username and password are required'});
-			return;
-		}
-
-		const salt = await bcrypt.genSalt();
-		const hashedPassword = await bcrypt.hash(password, salt);
-
-		const user = new User({
-			username,
-			password: hashedPassword,
-			salt,
-		});
-
-		await user.save();
-
-		const token = jwt.sign(
-			{username, passwordHash: user.password},
-			process.env.JWT_SECRET as string,
-			{expiresIn: '2h'}
-		);
-
-		res.status(201).json({token, user});
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
+app.get('*', (req: Request, res: Response) => {
+	const filePath = path.join(__dirname, '../../client/dist/index.html');
+	res.sendFile(filePath);
 });
 
 app.listen(port, () => {

@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 export interface IUser extends mongoose.Document {
 	username: string;
 	password: string;
-	salt?: string;
 	todos: [{
 		title: string;
 		completed: boolean;
