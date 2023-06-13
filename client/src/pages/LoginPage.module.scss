@@ -1,6 +1,8 @@
 .LoginPage {
 
-	margin: 0 30vw;
+	margin: 0 auto;
+
+	width: clamp(300px, 50%, 400px);
 
 	& > h3 {
 		font-weight: 700;

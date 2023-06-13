@@ -15,13 +15,22 @@ const App = () => {
 
 	const [user, setUser] = React.useState(null);
 
-	const [visits, setVisits] = React.useState(0);
+	const [visitCount, setVisitCount] = React.useState(0);
+	const [userCount, setUserCount] = React.useState(0);
+
 	useEffect(() => {
-		const fetchVisits = async () => {
-			const response = await axios.get("/api/visits");
-			setVisits(response.data);
+		const fetchVisitCount = async () => {
+			const response = await axios.get("/api/statistics/interactions");
+			setVisitCount(response.data.interactionCount);
 		}
-	}, []);
+		fetchVisitCount();
+
+		const fetchUserCount = async () => {
+			const response = await axios.get("/api/statistics/users");
+			setUserCount(response.data.userCount);
+		}
+		fetchUserCount();
+	}, [location.pathname]);
 
 	useEffect(() => {
 		if (!user) {
@@ -33,7 +42,7 @@ const App = () => {
 							setUser(response.data);
 						})
 						.catch(error => {
-							console.log(error);
+							console.error(error);
 						})
 				} catch (error) {
 					navigate("/login")
@@ -93,7 +102,11 @@ const App = () => {
 				<footer>
 					<p>Created by <a href="https://github.com/TheAyes" target="_blank"
 									 rel="noopener noreferrer">TheAyes</a> ❤</p>
-					<p>Interactions today: {visits}</p>
+					<article>
+						<p>Amount of Users: {userCount}</p>
+						<p>Total Interaction: {visitCount}</p>
+					</article>
+
 				</footer>
 			</div>
 		</UserContext.Provider>

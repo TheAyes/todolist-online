@@ -11,7 +11,7 @@ import {
 } from "./AuthenticationController.js";
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
-import * as fs from "fs";
+import {getInteractionCount, getUserCount, incrementInteractionCount} from "./StatisticsController.js";
 
 config();
 
@@ -27,32 +27,32 @@ app.use(express.json());
 await mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@${process.env.MONGO_CLUSTER}.mongodb.net/?retryWrites=true&w=majority`)
 
 
-app.get('/api/todos', authenticateUser, async (req: Request, res: Response) => {
+app.get('/api/todos', authenticateUser, incrementInteractionCount, async (req: Request, res: Response) => {
 
 	await getAllTodos(req, res);
 });
 
-app.get('/api/todos/:id', authenticateUser, async (req: Request, res: Response) => {
+app.get('/api/todos/:id', authenticateUser, incrementInteractionCount, async (req: Request, res: Response) => {
 	await getOneTodo(req, res);
 });
 
-app.post('/api/todos', authenticateUser, async (req: Request, res: Response) => {
+app.post('/api/todos', authenticateUser, incrementInteractionCount, async (req: Request, res: Response) => {
 	await createTodo(req, res);
 });
 
-app.patch('/api/todos/:id', authenticateUser, async (req: Request, res: Response) => {
+app.patch('/api/todos/:id', authenticateUser, incrementInteractionCount, async (req: Request, res: Response) => {
 	await updateTodo(req, res);
 });
 
-app.delete('/api/todos/:id', authenticateUser, async (req: Request, res: Response) => {
+app.delete('/api/todos/:id', authenticateUser, incrementInteractionCount, async (req: Request, res: Response) => {
 	await deleteTodo(req, res);
 });
 
-app.post('/api/login', async (req: Request, res: Response) => {
+app.post('/api/login', incrementInteractionCount, async (req: Request, res: Response) => {
 	await handleUserLogin(req, res);
 });
 
-app.post('/api/register', async (req: Request, res: Response) => {
+app.post('/api/register', incrementInteractionCount, async (req: Request, res: Response) => {
 	await handleUserRegistration(req, res);
 });
 
@@ -60,8 +60,12 @@ app.post('/api/refresh', async (req: Request, res: Response) => {
 	await handleTokenRefresh(req, res);
 });
 
-app.get("api/visits", async (req: Request, res: Response) => {
-	const visits = fs.readFileSync("visits.txt", "utf-8");
+app.get("/api/statistics/interactions", async (req: Request, res: Response) => {
+	await getInteractionCount(req, res);
+});
+
+app.get("/api/statistics/users", async (req: Request, res: Response) => {
+	await getUserCount(req, res);
 });
 
 app.get('*', (req: Request, res: Response) => {
