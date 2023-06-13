@@ -3,7 +3,12 @@ import path, {dirname, join} from 'path';
 import {config} from 'dotenv';
 import {createTodo, deleteTodo, getAllTodos, getOneTodo, updateTodo} from "./TodoController.ts";
 import * as process from "process";
-import {authenticateUser, handleUserLogin, handleUserRegistration} from "./AuthenticationController.ts";
+import {
+	authenticateUser,
+	handleTokenRefresh,
+	handleUserLogin,
+	handleUserRegistration
+} from "./AuthenticationController.ts";
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
 
@@ -42,11 +47,14 @@ app.delete('/api/todos/:id', authenticateUser, async (req: Request, res: Respons
 
 app.post('/api/login', async (req: Request, res: Response) => {
 	await handleUserLogin(req, res);
-
 });
 
 app.post('/api/register', async (req: Request, res: Response) => {
 	await handleUserRegistration(req, res);
+});
+
+app.post('/api/refresh', async (req: Request, res: Response) => {
+	await handleTokenRefresh(req, res);
 });
 
 app.get('*', (req: Request, res: Response) => {

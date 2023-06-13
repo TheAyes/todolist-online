@@ -1,7 +1,7 @@
 import {User} from './models/User.ts';
 import bcrypt from 'bcrypt';
 import {NextFunction, Request, Response} from 'express';
-import {authenticate, generateToken} from "jwt-authorize";
+import {authenticate, generateToken, refreshToken} from "jwt-authorize";
 import * as process from "process";
 
 declare global {
@@ -57,15 +57,23 @@ export const handleUserRegistration = async (req: Request, res: Response) => {
 		const hashedPassword = await bcrypt.hash(password, userSalt);
 
 		const user = new User({
-			lowerCaseUsername,
+			username: lowerCaseUsername,
 			password: hashedPassword,
 		});
 
 		const savedUser = await user.save();
 
 		const result = generateToken(
-			{payload: {userid: savedUser._id}, secret: process.env.JWT_SECRET!, options: {expiresIn: '15m'}},
-			{payload: {userid: savedUser._id}, secret: process.env.JWT_REFRESH_SECRET!, options: {expiresIn: '7d'}}
+			{
+				payload: {userid: savedUser._id, hashedPassword: hashedPassword},
+				secret: process.env.JWT_SECRET!,
+				options: {expiresIn: '15m'}
+			},
+			{
+				payload: {userid: savedUser._id, hashedPassword: hashedPassword},
+				secret: process.env.JWT_REFRESH_SECRET!,
+				options: {expiresIn: '7d'}
+			}
 		);
 
 		return res.status(201).json({
@@ -74,6 +82,7 @@ export const handleUserRegistration = async (req: Request, res: Response) => {
 			error: null
 		});
 	} catch (err: any) {
+		console.error(err)
 		return res.status(500).json({accessToken: null, refreshToken: null, user: null, error: err.message});
 	}
 };
@@ -102,8 +111,16 @@ export const handleUserLogin = async (req: Request, res: Response) => {
 		}
 
 		const result = generateToken(
-			{payload: {userid: foundUser._id}, secret: process.env.JWT_SECRET!, options: {expiresIn: '15m'}},
-			{payload: {userid: foundUser._id}, secret: process.env.JWT_REFRESH_SECRET!, options: {expiresIn: '7d'}}
+			{
+				payload: {userid: foundUser._id, hashedPassword: foundUser.password},
+				secret: process.env.JWT_SECRET!,
+				options: {expiresIn: '15m'}
+			},
+			{
+				payload: {userid: foundUser._id, hashedPassword: foundUser.password},
+				secret: process.env.JWT_REFRESH_SECRET!,
+				options: {expiresIn: '7d'}
+			}
 		);
 
 		return res.status(200).json({
@@ -114,5 +131,53 @@ export const handleUserLogin = async (req: Request, res: Response) => {
 
 	} catch (err: any) {
 		return {accessToken: null, refreshToken: null, user: null, error: err.message};
+	}
+};
+
+export const handleTokenRefresh = async (req: Request, res: Response) => {
+	const authHeader = req.headers['authorization'];
+	const token = authHeader && authHeader.split(' ')[1];
+
+	if (!token) {
+		return res.status(401).json({error: 'Token is required'});
+	}
+
+	const refreshSecret = process.env.JWT_REFRESH_SECRET;
+	const jwtSecret = process.env.JWT_SECRET;
+
+	if (!refreshSecret || !jwtSecret) {
+		return res.status(500).json({error: 'Server configuration error'});
+	}
+
+	const result = refreshToken(
+		token,
+		refreshSecret,
+		(payload) => {
+			// Check if payload is an object and has a userid property
+			if (typeof payload === 'object' && 'userid' in payload) {
+				return {userid: payload.userid};
+			}
+			return {};  // return an empty object if the check fails
+		},
+		{
+			payload: {}, // Payload can be set here if required
+			secret: jwtSecret,
+			options: {expiresIn: '15m'}
+		},
+		{
+			payload: {userid: req.user._id}, // make sure req.user is defined
+			secret: jwtSecret,
+			options: {expiresIn: '15m'}
+		}
+	);
+
+	// Handling the result of refreshToken
+	if (result.status === 200) {
+		return res.json({
+			accessToken: result.accessToken,
+			refreshToken: result.refreshToken,
+		});
+	} else {
+		return res.status(result.status!).json({error: result.error});
 	}
 };

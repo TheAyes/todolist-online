@@ -18,8 +18,8 @@ dependencies:
     specifier: ^9.0.0
     version: 9.0.0
   jwt-authorize:
-    specifier: ^1.0.7
-    version: 1.0.7
+    specifier: ^1.0.9
+    version: 1.0.9
   mongoose:
     specifier: ^7.2.3
     version: 7.2.3
@@ -779,8 +779,8 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-  /jwt-authorize@1.0.7:
-    resolution: {integrity: sha512-LgLqPoCYoEQfb6N5tkHw2FZvHD2marEch8piVEU3Iai02tVX/f1renS8fPbTsqJmeh8QXCACZKykiAo9dtAg2w==}
+  /jwt-authorize@1.0.9:
+    resolution: {integrity: sha512-r+Z68gmDlfKuACv6MP+z7yebsZD8DrP4aijQTtfw9lLgfoh2uySXIrXR/MqjSQNFRrozChyFUtPvVhl9h8FD/g==}
     dependencies:
       jsonwebtoken: 9.0.0
     dev: false

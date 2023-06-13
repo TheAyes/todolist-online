@@ -2,6 +2,7 @@ import React from 'react';
 import styles from "./LoginPage.module.scss";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import LoginForm from "../components/Login-Register/LoginForm.jsx";
 
 
 const LoginPage = () => {
@@ -23,8 +24,6 @@ const LoginPage = () => {
 		} catch (error) {
 			setErrorMessage("Invalid username or password");
 		}
-
-
 	}
 
 	const handlePasswordRecovery = async () => {
@@ -36,19 +35,7 @@ const LoginPage = () => {
 			<hgroup>
 				<h3>Login</h3>
 			</hgroup>
-			<p>{errorMessage}</p>
-			<form onSubmit={handleLogin}>
-				<fieldset style={{
-					border: `2px solid ${errorMessage ? "#ff4400" : "transparent"}`,
-					padding: "1rem",
-				}}>
-					<input type="text" placeholder="Username" required/>
-					<input type="password" placeholder="Password" required/>
-				</fieldset>
-
-				<a href="" onClick={handlePasswordRecovery}>Forgot your password?</a>
-				<input type="submit" value="Login"/>
-			</form>
+			<LoginForm/>
 		</div>
 	);
 };
