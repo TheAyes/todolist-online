@@ -29,12 +29,9 @@ const LoginPage = () => {
 	const handlePasswordRecovery = async () => {
 		window.alert("Yea, sorry we don't have password recovery yet.");
 	}
-	console.log(errorMessage)
 	return (
 		<div className={styles.LoginPage}>
-			<hgroup>
-				<h3>Login</h3>
-			</hgroup>
+			<h3>Login</h3>
 			<LoginForm/>
 		</div>
 	);

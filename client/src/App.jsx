@@ -19,13 +19,18 @@ const App = () => {
 		if (!user) {
 			const token = JSON.parse(localStorage.getItem("userToken"));
 			if (token) {
-				axios.post("/api/refresh", {headers: {Authorization: `Bearer ${token.accessToken}`}})
-					.then(response => {
-						setUser(response.data);
-					})
-					.catch(error => {
-						console.log(error);
-					})
+				try {
+					axios.post("/api/refresh", {headers: {Authorization: `Bearer ${token.accessToken}`}})
+						.then(response => {
+							setUser(response.data);
+						})
+						.catch(error => {
+							console.log(error);
+						})
+				} catch (error) {
+					navigate("/login")
+				}
+
 			}
 		}
 	}, [])
@@ -35,7 +40,7 @@ const App = () => {
 
 		const redirect = async () => {
 			if (location.pathname === "/") {
-				const response = await axios.post("/api/refresh", {headers: {Authorization: `Bearer ${token.accessToken}`}});
+				navigate("/login")
 			}
 		}
 		redirect();
@@ -64,12 +69,11 @@ const App = () => {
 								</button>
 								<button onClick={() => {
 									navigate("/register")
-								}}>Signup
+								}}>Register
 								</button>
 							</>
 						}
 					</div>
-
 				</header>
 
 				<Routes>
@@ -77,6 +81,11 @@ const App = () => {
 					<Route path="/login" element={<LoginPage/>}/>
 					<Route path="/register" element={<RegisterPage/>}/>
 				</Routes>
+
+				<footer>
+					<p>Created by <a href="https://github.com/TheAyes" target="_blank"
+									 rel="noopener noreferrer">TheAyes</a> ❤</p>
+				</footer>
 			</div>
 		</UserContext.Provider>
 	);

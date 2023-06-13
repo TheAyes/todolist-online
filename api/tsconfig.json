@@ -10,6 +10,7 @@
 		"skipLibCheck": true,
 		"allowJs": false,
 		"forceConsistentCasingInFileNames": true,
+		"outDir": "../dist/api/",
 		"lib": [
 			"esnext",
 			"dom"

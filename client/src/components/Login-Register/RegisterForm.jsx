@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import styles from './LoginForm.module.scss'
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
@@ -8,6 +8,19 @@ const UserHandlingForm = ({targetEndpoint}) => {
 	const {user, setUser} = useContext(UserContext);
 	const [errorMessage, setErrorMessage] = React.useState("");
 	const navigate = useNavigate();
+
+
+	useEffect(() => {
+		if (errorMessage) {
+			document.querySelectorAll("form > fieldset > label > input").forEach((input) => {
+				input.classList.add("error");
+			});
+		} else {
+			document.querySelectorAll("form > fieldset > label > input").forEach((input) => {
+				input.classList.remove("error");
+			});
+		}
+	}, [errorMessage]);
 
 	const labelError = {
 		color: `${errorMessage ? "#ff1111" : "var(--primary-paragraph-color)"}`
@@ -20,11 +33,17 @@ const UserHandlingForm = ({targetEndpoint}) => {
 		setErrorMessage("");
 	};
 
-	const handleLogin = async (event) => {
+	const handleRegister = async (event) => {
 		event.preventDefault();
 
 		const username = event.target[0].value;
 		const password = event.target[1].value;
+		const confirmPassword = event.target[2].value;
+
+		if (password !== confirmPassword) {
+			setErrorMessage("Passwords do not match");
+			return;
+		}
 
 		try {
 			const response = await axios.post(targetEndpoint, {username, password});
@@ -32,12 +51,12 @@ const UserHandlingForm = ({targetEndpoint}) => {
 
 			navigate("/list")
 		} catch (error) {
-			setErrorMessage("Invalid username or password");
+			setErrorMessage(error.message);
 		}
 	};
 
 	return (
-		<form className={styles.LoginForm} onSubmit={handleLogin}>
+		<form className={styles.LoginForm} onSubmit={handleRegister}>
 			<p style={{
 				display: errorMessage ? "block" : "none",
 			}}>{errorMessage}</p>
@@ -54,11 +73,15 @@ const UserHandlingForm = ({targetEndpoint}) => {
 						resetError();
 					}}/>
 				</label>
-				<a href="" onClick={() => {
-					window.alert("Yea, sorry we don't have password recovery yet.");
-				}}>Forgot your password?</a>
+				<label>
+					Confirm Password
+					<input type="password" placeholder="Your Password" required style={inputError} onChange={() => {
+						resetError();
+					}}/>
+				</label>
+				<a></a>
 			</fieldset>
-			<input type="submit" value="Login"/>
+			<input type="submit" value="Register"/>
 		</form>
 	);
 };

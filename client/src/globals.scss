@@ -1,0 +1,95 @@
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+:root {
+	--primary-bg: rgb(30, 30, 30);
+	--primary-color: rgb(225, 225, 250);
+	--primary-headline-color: rgb(255, 220, 250);
+	--primary-paragraph-color: rgb(180, 200, 250);
+	--primary-anchor-color: rgb(0, 150, 255);
+	--primary-anchor-color-hover: rgb(200, 200, 255);
+	--primary-border-color: rgba(255, 255, 255, 0.2);
+	--primary-border-color-hover: rgba(205, 220, 250, 0.65);
+
+	--error-color: #ff1111;
+
+	--paper-bg: var(--primary-bg);
+	--paper-color: var(--primary-color);
+	--paper-headline-color: var(--primary-headline-color);
+	--paper-paragraph-color: var(--primary-paragraph-color);
+	--paper-anchor-color: var(--primary-anchor-color);
+	--paper-border-color: var(--primary-border-color);
+	--paper-border-color-hover: var(--primary-border-color-hover);
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+
+html {
+	scroll-behavior: smooth;
+	background: var(--primary-bg);
+}
+
+body {
+	font-family: Inter, system-ui, sans-serif;
+	color: var(--primary-color);
+}
+
+h1, h2, h3,
+h4, h5, h6 {
+	color: var(--primary-headline-color);
+}
+
+p, label, a {
+	font-weight: 500;
+}
+
+p, label {
+	color: var(--primary-paragraph-color);
+}
+
+a {
+	color: var(--primary-anchor-color);
+	text-decoration: none;
+	transition: color 200ms;
+}
+
+a:hover {
+	color: var(--primary-anchor-color-hover);
+}
+
+input, button {
+	font-family: inherit;
+	font-weight: inherit;
+	outline: 2px solid transparent;
+	border: 2px solid var(--primary-border-color);
+	border-radius: 0.2rem;
+	background: var(--paper-bg);
+	color: var(--paper-color);
+	transition: border 200ms, outline 200ms;
+}
+
+input.error, button.error {
+	border: 2px solid var(--error-color);
+}
+
+input:hover, button:hover {
+	border: 2px solid var(--primary-border-color-hover);
+	cursor: pointer;
+}
+
+input:focus, button:focus {
+	outline: 2px solid var(--primary-border-color-hover);
+}
+
+button {
+	font-weight: 500;
+	font-family: inherit;
+	padding: 0.5rem 1rem;
+}
