@@ -28,7 +28,7 @@ const App = () => {
 			const token = JSON.parse(localStorage.getItem("userToken"));
 			if (token) {
 				try {
-					axios.post("/api/refresh", {headers: {"Authorization": `Bearer ${token.accessToken}`}})
+					axios.post("/api/refresh", {}, {headers: {"Authorization": `Bearer ${token.accessToken}`}})
 						.then(response => {
 							setUser(response.data);
 						})

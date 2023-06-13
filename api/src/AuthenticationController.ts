@@ -136,10 +136,7 @@ export const handleUserLogin = async (req: Request, res: Response) => {
 
 export const handleTokenRefresh = async (req: Request, res: Response) => {
 	const authHeader = req.get('Authorization') || req.get('authorization');
-	console.log(authHeader)
 	const token = authHeader && authHeader.split(' ')[1];
-	console.log(req.headers);
-
 	if (!token) {
 		return res.status(401).json({error: 'Token is required'});
 	}
@@ -155,22 +152,9 @@ export const handleTokenRefresh = async (req: Request, res: Response) => {
 		token,
 		refreshSecret,
 		(payload) => {
-			// Check if payload is an object and has a userid property
-			if (typeof payload === 'object' && 'userid' in payload) {
-				return {userid: payload.userid};
-			}
-			return {};  // return an empty object if the check fails
+			return payload;
 		},
-		{
-			payload: {}, // Payload can be set here if required
-			secret: jwtSecret,
-			options: {expiresIn: '15m'}
-		},
-		{
-			payload: {userid: req.user._id}, // make sure req.user is defined
-			secret: jwtSecret,
-			options: {expiresIn: '15m'}
-		}
+		true
 	);
 
 	// Handling the result of refreshToken

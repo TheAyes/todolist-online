@@ -96,12 +96,13 @@ const TodoList = () => {
 	}, [todos]);
 
 	return (
-		<>
+		<div>
 			<form onSubmit={handleSubmit}>
 				<input
 					type="text"
 					id="addTodoField"
 					value={inputValue}
+					placeholder="Add a new todo!"
 					onChange={event => setInputValue(event.target.value)}
 				/>
 			</form>
@@ -117,7 +118,7 @@ const TodoList = () => {
 					/>
 				})}
 			</ul>
-		</>
+		</div>
 	);
 };
 

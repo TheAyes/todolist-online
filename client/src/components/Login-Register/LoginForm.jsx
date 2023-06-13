@@ -28,11 +28,13 @@ const UserHandlingForm = ({targetEndpoint}) => {
 	const handleLogin = async (event) => {
 		event.preventDefault();
 
-		const username = event.target[0].value;
-		const password = event.target[1].value;
+		const username = event.target[1].value;
+		const password = event.target[2].value;
+
+		const lowercaseUsername = username.toLowerCase();
 
 		try {
-			const response = await axios.post("/api/login", {username, password});
+			const response = await axios.post("/api/login", {username: lowercaseUsername, password});
 			localStorage.setItem("userToken", JSON.stringify(response.data));
 
 			navigate("/list")
