@@ -3,9 +3,9 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"build": "npm run build-api && npm run build-client",
-		"build-api": "npm --prefix ./api install && npm --prefix ./api run build",
-		"build-client": "npm --prefix ./client install && npm --prefix ./client run build"
+		"build": "pnpm run build-api && pnpm run build-client",
+		"build-api": "pnpm --prefix ./api install && pnpm --prefix ./api run build",
+		"build-client": "pnpm --prefix ./client install && pnpm --prefix ./client run build"
 	},
 	"dependencies": {
 		"dotenv": "^16.1.4"
