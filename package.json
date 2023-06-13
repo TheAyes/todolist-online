@@ -4,12 +4,12 @@
 	"type": "module",
 	"license": "MIT",
 	"scripts": {
-		"install:api": "yarn --cwd ./api install",
-		"install:client": "yarn --cwd ./client install",
-		"install:both": "yarn --cwd ./api install && yarn --cwd ./client install",
-		"build:api": "yarn --cwd ./api build",
-		"build:client": "yarn --cwd ./client build",
-		"build:both": "yarn --cwd ./api build && yarn --cwd ./client build"
+		"install:api": "pnpm install --prefix ./api",
+		"install:client": "pnpm install --prefix ./client",
+		"install:both": "pnpm install --prefix ./api && pnpm install --prefix ./client",
+		"build:api": "pnpm run build --prefix ./api",
+		"build:client": "pnpm run build --prefix ./client",
+		"build:both": "pnpm run build --prefix ./api && pnpm run build --prefix ./client"
 	},
 	"dependencies": {
 		"dotenv": "^16.1.4"

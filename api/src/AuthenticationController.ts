@@ -1,4 +1,4 @@
-import {User} from './models/User';
+import {User} from './models/User.js';
 import bcrypt from 'bcrypt';
 import {NextFunction, Request, Response} from 'express';
 import {authenticate, generateToken, refreshToken} from "jwt-authorize";
