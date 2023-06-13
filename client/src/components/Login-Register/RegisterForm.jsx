@@ -56,9 +56,10 @@ const UserHandlingForm = ({targetEndpoint}) => {
 			<fieldset>
 				<label>
 					Username
-					<input type="text" placeholder="Your Username" required onChange={() => {
-						resetError();
-					}}/>
+					<input type="text" placeholder="Your Username" required minLength="3" maxLength="26"
+						   onChange={() => {
+							   resetError();
+						   }}/>
 				</label>
 				<label>
 					Password

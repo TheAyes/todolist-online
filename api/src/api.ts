@@ -12,6 +12,7 @@ import {
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
 import {getInteractionCount, getUserCount, incrementInteractionCount} from "./StatisticsController.js";
+import {sanitizeBody} from "../SecurityController";
 
 config();
 
@@ -36,7 +37,7 @@ app.get('/api/todos/:id', authenticateUser, incrementInteractionCount, async (re
 	await getOneTodo(req, res);
 });
 
-app.post('/api/todos', authenticateUser, incrementInteractionCount, async (req: Request, res: Response) => {
+app.post('/api/todos', authenticateUser, sanitizeBody, incrementInteractionCount, async (req: Request, res: Response) => {
 	await createTodo(req, res);
 });
 

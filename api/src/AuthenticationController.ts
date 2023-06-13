@@ -42,7 +42,15 @@ export const doesUserExist = async (username: string = ''): Promise<boolean> => 
 
 // Modified handleUserRegistration function to generate refresh tokens
 export const handleUserRegistration = async (req: Request, res: Response) => {
+	const usernamePattern = /^[a-zA-Z0-9_-]{3,26}$/;
 	const {username, password} = req.body;
+
+	if (!usernamePattern.test(username)) return res.status(400).json({
+		accessToken: null,
+		refreshToken: null,
+		error: 'Invalid username'
+	});
+
 	const lowerCaseUsername = username.toLowerCase();
 	try {
 		if (await doesUserExist(lowerCaseUsername)) {
