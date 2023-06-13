@@ -12,7 +12,7 @@ import {
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
 import {getInteractionCount, getUserCount, incrementInteractionCount} from "./StatisticsController.js";
-import {sanitizeBody} from "../SecurityController";
+import {sanitizeBody} from "../SecurityController.js";
 
 config();
 
