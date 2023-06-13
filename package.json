@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"scripts": {
 		"build": "npm run build-api && npm run build-client",
-		"build-api": "npm --prefix ./api run build",
-		"build-client": "npm --prefix ./client run build"
+		"build-api": "npm --prefix ./api install && npm --prefix ./api run build",
+		"build-client": "npm --prefix ./client install && npm --prefix ./client run build"
 	},
 	"dependencies": {
 		"dotenv": "^16.1.4"
