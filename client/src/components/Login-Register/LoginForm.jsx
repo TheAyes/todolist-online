@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import styles from './LoginForm.module.scss'
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
@@ -9,12 +9,17 @@ const UserHandlingForm = ({targetEndpoint}) => {
 	const [errorMessage, setErrorMessage] = React.useState("");
 	const navigate = useNavigate();
 
-	const labelError = {
-		color: `${errorMessage ? "#ff1111" : "var(--primary-paragraph-color)"}`
-	}
-	const inputError = {
-		border: `2px solid ${errorMessage ? "#ff1111" : "var(--primary-border-color)"}`
-	};
+	useEffect(() => {
+		if (errorMessage) {
+			document.querySelectorAll("form > fieldset > label > input").forEach((input) => {
+				input.classList.add("error");
+			});
+		} else {
+			document.querySelectorAll("form > fieldset > label > input").forEach((input) => {
+				input.classList.remove("error");
+			});
+		}
+	}, [errorMessage]);
 
 	const resetError = () => {
 		setErrorMessage("");
@@ -27,7 +32,7 @@ const UserHandlingForm = ({targetEndpoint}) => {
 		const password = event.target[1].value;
 
 		try {
-			const response = await axios.post(targetEndpoint, {username, password});
+			const response = await axios.post("/api/login", {username, password});
 			localStorage.setItem("userToken", JSON.stringify(response.data));
 
 			navigate("/list")
@@ -44,13 +49,13 @@ const UserHandlingForm = ({targetEndpoint}) => {
 			<fieldset>
 				<label>
 					Username
-					<input type="text" placeholder="Your Username" required style={inputError} onChange={() => {
+					<input type="text" placeholder="Your Username" required onChange={() => {
 						resetError();
 					}}/>
 				</label>
 				<label>
 					Password
-					<input type="password" placeholder="Your Password" required style={inputError} onChange={() => {
+					<input type="password" placeholder="Your Password" required onChange={() => {
 						resetError();
 					}}/>
 				</label>

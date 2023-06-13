@@ -11,6 +11,7 @@ import {
 } from "./AuthenticationController.ts";
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
+import * as fs from "fs";
 
 config();
 
@@ -20,12 +21,14 @@ const __dirname = dirname(__filename);
 const app: Express = express();
 const port = process.env.API_PORT || 3000;
 
-app.use(express.static(join(__dirname, '../../client/dist')));
+app.use(express.static(join(__dirname, '../../dist/client')));
 app.use(express.json());
 
 await mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@${process.env.MONGO_CLUSTER}.mongodb.net/?retryWrites=true&w=majority`)
 
+
 app.get('/api/todos', authenticateUser, async (req: Request, res: Response) => {
+
 	await getAllTodos(req, res);
 });
 
@@ -57,8 +60,12 @@ app.post('/api/refresh', async (req: Request, res: Response) => {
 	await handleTokenRefresh(req, res);
 });
 
+app.get("api/visits", async (req: Request, res: Response) => {
+	const visits = fs.readFileSync("visits.txt", "utf-8");
+});
+
 app.get('*', (req: Request, res: Response) => {
-	const filePath = path.join(__dirname, '../../client/dist/index.html');
+	const filePath = path.join(__dirname, '../../dist/client/index.html');
 	res.sendFile(filePath);
 });
 

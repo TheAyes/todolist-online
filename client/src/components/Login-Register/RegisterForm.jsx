@@ -22,13 +22,6 @@ const UserHandlingForm = ({targetEndpoint}) => {
 		}
 	}, [errorMessage]);
 
-	const labelError = {
-		color: `${errorMessage ? "#ff1111" : "var(--primary-paragraph-color)"}`
-	}
-	const inputError = {
-		border: `2px solid ${errorMessage ? "#ff1111" : "var(--primary-border-color)"}`
-	};
-
 	const resetError = () => {
 		setErrorMessage("");
 	};
@@ -36,9 +29,9 @@ const UserHandlingForm = ({targetEndpoint}) => {
 	const handleRegister = async (event) => {
 		event.preventDefault();
 
-		const username = event.target[0].value;
-		const password = event.target[1].value;
-		const confirmPassword = event.target[2].value;
+		const username = event.target[1].value;
+		const password = event.target[2].value;
+		const confirmPassword = event.target[3].value;
 
 		if (password !== confirmPassword) {
 			setErrorMessage("Passwords do not match");
@@ -46,7 +39,7 @@ const UserHandlingForm = ({targetEndpoint}) => {
 		}
 
 		try {
-			const response = await axios.post(targetEndpoint, {username, password});
+			const response = await axios.post("/api/register", {username, password});
 			localStorage.setItem("userToken", JSON.stringify(response.data));
 
 			navigate("/list")
@@ -63,19 +56,19 @@ const UserHandlingForm = ({targetEndpoint}) => {
 			<fieldset>
 				<label>
 					Username
-					<input type="text" placeholder="Your Username" required style={inputError} onChange={() => {
+					<input type="text" placeholder="Your Username" required onChange={() => {
 						resetError();
 					}}/>
 				</label>
 				<label>
 					Password
-					<input type="password" placeholder="Your Password" required style={inputError} onChange={() => {
+					<input type="password" placeholder="Your Password" required onChange={() => {
 						resetError();
 					}}/>
 				</label>
 				<label>
 					Confirm Password
-					<input type="password" placeholder="Your Password" required style={inputError} onChange={() => {
+					<input type="password" placeholder="Your Password" required onChange={() => {
 						resetError();
 					}}/>
 				</label>

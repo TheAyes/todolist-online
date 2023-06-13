@@ -5,10 +5,10 @@ import RegisterForm from "../components/Login-Register/RegisterForm.jsx";
 
 const RegisterPage = () => {
 	return (
-		<div className={styles.LoginPage}>
+		<main className={styles.LoginPage}>
 			<h3>Register</h3>
 			<RegisterForm/>
-		</div>
+		</main>
 	);
 };
 

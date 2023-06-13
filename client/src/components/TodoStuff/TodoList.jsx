@@ -16,7 +16,7 @@ const TodoList = () => {
 		const userToken = JSON.parse(localStorage.getItem("userToken"));
 		const response = await axios.get("/api/todos", {
 			headers: {
-				Authorization: `Bearer ${userToken.accessToken}`,
+				"Authorization": `Bearer ${userToken.accessToken}`
 			}
 		});
 
@@ -46,7 +46,7 @@ const TodoList = () => {
 				status: newTodo.status,
 			}, {
 				headers: {
-					Authorization: `Bearer ${userToken.accessToken}`,
+					"Authorization": `Bearer ${userToken.accessToken}`
 				}
 			});
 			setTodos(prevTodos => [...prevTodos, response.data]);
@@ -63,7 +63,7 @@ const TodoList = () => {
 
 			const response = await axios.patch(`/api/todos/${id}?status=${!todos[foundIndex].status}`, null, {
 				headers: {
-					Authorization: `Bearer ${userToken.accessToken}`,
+					"Authorization": `Bearer ${userToken.accessToken}`
 				}
 			});
 
@@ -82,7 +82,7 @@ const TodoList = () => {
 		try {
 			const response = await axios.delete(`/api/todos/${id}`, {
 				headers: {
-					Authorization: `Bearer ${userToken.accessToken}`,
+					"Authorization": `Bearer ${userToken.accessToken}`
 				}
 			});
 			if (response.status === 200) {

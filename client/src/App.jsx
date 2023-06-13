@@ -15,12 +15,20 @@ const App = () => {
 
 	const [user, setUser] = React.useState(null);
 
+	const [visits, setVisits] = React.useState(0);
+	useEffect(() => {
+		const fetchVisits = async () => {
+			const response = await axios.get("/api/visits");
+			setVisits(response.data);
+		}
+	}, []);
+
 	useEffect(() => {
 		if (!user) {
 			const token = JSON.parse(localStorage.getItem("userToken"));
 			if (token) {
 				try {
-					axios.post("/api/refresh", {headers: {Authorization: `Bearer ${token.accessToken}`}})
+					axios.post("/api/refresh", {headers: {"Authorization": `Bearer ${token.accessToken}`}})
 						.then(response => {
 							setUser(response.data);
 						})
@@ -85,6 +93,7 @@ const App = () => {
 				<footer>
 					<p>Created by <a href="https://github.com/TheAyes" target="_blank"
 									 rel="noopener noreferrer">TheAyes</a> ❤</p>
+					<p>Interactions today: {visits}</p>
 				</footer>
 			</div>
 		</UserContext.Provider>

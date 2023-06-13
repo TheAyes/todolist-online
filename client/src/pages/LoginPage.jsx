@@ -30,10 +30,10 @@ const LoginPage = () => {
 		window.alert("Yea, sorry we don't have password recovery yet.");
 	}
 	return (
-		<div className={styles.LoginPage}>
+		<main className={styles.LoginPage}>
 			<h3>Login</h3>
 			<LoginForm/>
-		</div>
+		</main>
 	);
 };
 

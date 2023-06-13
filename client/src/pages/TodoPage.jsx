@@ -4,9 +4,9 @@ import TodoList from "../components/TodoStuff/TodoList.jsx";
 
 const TodoPage = () => {
 	return (
-		<div className={styles.TodoPage}>
+		<main className={styles.TodoPage}>
 			<TodoList/>
-		</div>
+		</main>
 	);
 };
 

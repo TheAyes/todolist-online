@@ -14,7 +14,7 @@ declare global {
 }
 
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-	const authHeader = req.headers['authorization'];
+	const authHeader = req.get('Authorization') || req.get('authorization');
 	const token = authHeader && authHeader.split(' ')[1];
 
 
@@ -135,8 +135,10 @@ export const handleUserLogin = async (req: Request, res: Response) => {
 };
 
 export const handleTokenRefresh = async (req: Request, res: Response) => {
-	const authHeader = req.headers['authorization'];
+	const authHeader = req.get('Authorization') || req.get('authorization');
+	console.log(authHeader)
 	const token = authHeader && authHeader.split(' ')[1];
+	console.log(req.headers);
 
 	if (!token) {
 		return res.status(401).json({error: 'Token is required'});
