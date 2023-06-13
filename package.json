@@ -1,6 +1,7 @@
 {
 	"name": "todo-app-lite",
 	"version": "1.0.0",
+	"type": "module",
 	"scripts": {
 		"build": "npm run build-api && npm run build-client",
 		"build-api": "npm --prefix ./api install && npm --prefix ./api run build",
