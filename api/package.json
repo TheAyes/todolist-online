@@ -5,7 +5,7 @@
 	"main": "src/api.ts",
 	"license": "MIT",
 	"scripts": {
-		"build": "vite build --emptyOutDir",
+		"build": "tsc",
 		"start": "node --loader ts-node/esm ./src/api.ts"
 	},
 	"dependencies": {
