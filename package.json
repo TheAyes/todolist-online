@@ -2,6 +2,7 @@
 	"name": "todo-app-lite",
 	"version": "1.0.0",
 	"type": "module",
+	"license": "MIT",
 	"scripts": {
 		"install:api": "yarn --cwd ./api install",
 		"install:client": "yarn --cwd ./client install",
