@@ -8,7 +8,7 @@ import {
 	handleTokenRefresh,
 	handleUserLogin,
 	handleUserRegistration
-} from "./AuthenticationController";
+} from "./AuthenticationController.js";
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
 import * as fs from "fs";
