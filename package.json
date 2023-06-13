@@ -3,9 +3,9 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"build": "pnpm run build-api && pnpm run build-client",
-		"build-api": "pnpm --prefix ./api install && pnpm --prefix ./api run build",
-		"build-client": "pnpm --prefix ./client install && pnpm --prefix ./client run build"
+		"build": "yarn && yarn build-api && yarn build-client",
+		"build-api": "yarn --cwd ./api install && yarn --cwd ./api build",
+		"build-client": "yarn --cwd ./client install && yarn --cwd ./client build"
 	},
 	"dependencies": {
 		"dotenv": "^16.1.4"
