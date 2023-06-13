@@ -1,14 +1,14 @@
 import express, {Express, Request, Response} from 'express';
 import path, {dirname, join} from 'path';
 import {config} from 'dotenv';
-import {createTodo, deleteTodo, getAllTodos, getOneTodo, updateTodo} from "./TodoController.ts";
+import {createTodo, deleteTodo, getAllTodos, getOneTodo, updateTodo} from "./TodoController";
 import * as process from "process";
 import {
 	authenticateUser,
 	handleTokenRefresh,
 	handleUserLogin,
 	handleUserRegistration
-} from "./AuthenticationController.ts";
+} from "./AuthenticationController";
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
 import * as fs from "fs";
