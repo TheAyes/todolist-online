@@ -3,9 +3,12 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"build": "yarn && yarn build-api && yarn build-client",
-		"build-api": "yarn --cwd ./api install && yarn --cwd ./api build",
-		"build-client": "yarn --cwd ./client install && yarn --cwd ./client build"
+		"install:api": "yarn --cwd ./api install",
+		"install:client": "yarn --cwd ./client install",
+		"install:both": "yarn --cwd ./api install && yarn --cwd ./client install",
+		"build:api": "yarn --cwd ./api build",
+		"build:client": "yarn --cwd ./client build",
+		"build:both": "yarn --cwd ./api build && yarn --cwd ./client build"
 	},
 	"dependencies": {
 		"dotenv": "^16.1.4"
