@@ -1,9 +1,6 @@
 import {NextFunction, Request, Response} from "express";
-import {LocalStorage} from "node-localstorage";
 import {User} from "./models/User.js";
 import {Statistics} from "./models/Statistics.js";
-
-const localStorage = new LocalStorage('./scratch');
 
 export const incrementInteractionCount = async (req: Request, res: Response, next: NextFunction) => {
 	let statistics = await Statistics.findOne().exec()
@@ -25,7 +22,7 @@ export const getInteractionCount = async (req: Request, res: Response) => {
 
 	if (!statistics) return res.json({interactionCount: 0});
 
-	res.json(statistics.interactionCount);
+	res.json({interactionCount: statistics.interactionCount});
 }
 
 export const getUserCount = async (req: Request, res: Response) => {

@@ -6,7 +6,6 @@ import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import axios from "axios";
 
-
 export const UserContext = createContext(null);
 
 const App = () => {
@@ -21,6 +20,7 @@ const App = () => {
 	useEffect(() => {
 		const fetchVisitCount = async () => {
 			const response = await axios.get("/api/statistics/interactions");
+			console.log(response);
 			setInteractionCount(response.data.interactionCount);
 		}
 		fetchVisitCount();
