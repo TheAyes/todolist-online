@@ -15,13 +15,13 @@ const App = () => {
 
 	const [user, setUser] = React.useState(null);
 
-	const [visitCount, setVisitCount] = React.useState(0);
+	const [interactionCount, setInteractionCount] = React.useState(0);
 	const [userCount, setUserCount] = React.useState(0);
 
 	useEffect(() => {
 		const fetchVisitCount = async () => {
 			const response = await axios.get("/api/statistics/interactions");
-			setVisitCount(response.data.interactionCount);
+			setInteractionCount(response.data.interactionCount);
 		}
 		fetchVisitCount();
 
@@ -34,21 +34,29 @@ const App = () => {
 
 	useEffect(() => {
 
-		const token = JSON.parse(localStorage.getItem("userToken"));
+		try {
+			const token = JSON.parse(localStorage.getItem("userToken"));
 
-		const refreshToken = async () => {
-			const tokenResponse = await axios.post("/api/refresh", {}, {headers: {"Authorization": `Bearer ${token.refreshToken}`}})
-			localStorage.setItem("userToken", JSON.stringify(tokenResponse.data));
+			const refreshToken = async () => {
+				try {
+					const tokenResponse = await axios.post("/api/refresh", {}, {headers: {"Authorization": `Bearer ${token.refreshToken}`}})
+					localStorage.setItem("userToken", JSON.stringify(tokenResponse.data));
 
-			const userdataResponse = await axios.get("/api/user", {headers: {"Authorization": `Bearer ${tokenResponse.data.accessToken}`}})
-			setUser(userdataResponse.data.user);
-		};
-		refreshToken();
-	}, [])
+					const userdataResponse = await axios.get("/api/user", {headers: {"Authorization": `Bearer ${tokenResponse.data.accessToken}`}})
+					setUser(userdataResponse.data.user);
+				} catch (error) {
+					console.warn(error);
+				}
+
+			};
+			refreshToken();
+		} catch (error) {
+			console.error(error);
+		}
+
+	}, [location.pathname]);
 
 	useEffect(() => {
-
-
 		const redirect = async () => {
 			if (location.pathname === "/") {
 				navigate("/login")
@@ -124,7 +132,7 @@ const App = () => {
 									 rel="noopener noreferrer">TheAyes</a> ❤</p>
 					<article>
 						<p>Amount of Users: {userCount}</p>
-						<p>Total Interactions: {visitCount}</p>
+						<p>Total Interactions: {interactionCount}</p>
 					</article>
 
 				</footer>

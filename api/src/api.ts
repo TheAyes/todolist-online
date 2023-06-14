@@ -63,7 +63,7 @@ app.post('/api/refresh', async (req: Request, res: Response) => {
 	await handleTokenRefresh(req, res);
 });
 
-app.get("/api/user", authenticateUser, async (req: Request, res: Response) => {
+app.get("/api/user", authenticateUser, incrementInteractionCount, async (req: Request, res: Response) => {
 	await getUserData(req, res);
 });
 

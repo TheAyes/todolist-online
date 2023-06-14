@@ -1,11 +1,9 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import styles from './LoginForm.module.scss'
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
-import {UserContext} from "../../App.jsx";
 
 const UserHandlingForm = ({targetEndpoint}) => {
-	const {user, setUser} = useContext(UserContext);
 	const [errorMessage, setErrorMessage] = React.useState("");
 	const navigate = useNavigate();
 

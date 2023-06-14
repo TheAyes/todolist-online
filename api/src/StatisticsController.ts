@@ -6,8 +6,15 @@ import {Statistics} from "./models/Statistics.js";
 const localStorage = new LocalStorage('./scratch');
 
 export const incrementInteractionCount = async (req: Request, res: Response, next: NextFunction) => {
-	const statistics = await Statistics.findOne().exec()
+	let statistics = await Statistics.findOne().exec()
+	if (!statistics) {
+		statistics = new Statistics({
+			interactionCount: 0
+		});
+	}
 
+	statistics.interactionCount += 1;
+	await statistics.save();
 
 	next();
 };
