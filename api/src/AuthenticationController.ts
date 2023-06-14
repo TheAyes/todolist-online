@@ -1,8 +1,9 @@
 import {User} from './models/User.js';
 import bcrypt from 'bcrypt';
 import {NextFunction, Request, Response} from 'express';
-import {authenticate, generateToken, refreshToken} from "jwt-authorize";
+import {authenticate, generateToken, refreshToken, revokeManyTokens} from "jwt-authorize";
 import * as process from "process";
+import {v4 as uuidv4} from 'uuid';
 
 declare global {
 	namespace Express {
@@ -118,14 +119,16 @@ export const handleUserLogin = async (req: Request, res: Response) => {
 			});
 		}
 
+		const sessionId = uuidv4();
+
 		const result = generateToken(
 			{
-				payload: {userid: foundUser._id, hashedPassword: foundUser.password},
+				payload: {userid: foundUser._id, hashedPassword: foundUser.password, sessionId: sessionId},
 				secret: process.env.JWT_SECRET!,
 				options: {expiresIn: '15m'}
 			},
 			{
-				payload: {userid: foundUser._id, hashedPassword: foundUser.password},
+				payload: {userid: foundUser._id, hashedPassword: foundUser.password, sessionId: sessionId},
 				secret: process.env.JWT_REFRESH_SECRET!,
 				options: {expiresIn: '7d'}
 			}
@@ -159,10 +162,9 @@ export const handleTokenRefresh = async (req: Request, res: Response) => {
 	const result = refreshToken(
 		token,
 		refreshSecret,
-		(payload) => {
-			return payload;
-		},
-		true
+		jwtSecret,
+		"15m",
+		"7d"
 	);
 
 	// Handling the result of refreshToken
@@ -174,4 +176,31 @@ export const handleTokenRefresh = async (req: Request, res: Response) => {
 	} else {
 		return res.status(result.status!).json({error: result.error});
 	}
+};
+
+export const getUserData = async (req: Request, res: Response) => {
+	const user = req.user;
+
+	if (!user) return res.status(401).json({error: 'Unauthorized'});
+
+
+	const resultingUser = {
+		username: user.username,
+		_id: user._id,
+		todos: user.todos,
+	}
+
+	return res.json({user: resultingUser});
+};
+
+export const handleUserLogout = async (req: Request, res: Response) => {
+	const {accessToken, refreshToken} = req.body;
+
+	if (!accessToken || !refreshToken) {
+		return res.status(401).json({error: 'Unauthorized'});
+	}
+
+	revokeManyTokens([accessToken, refreshToken]);
+
+	return res.status(200).json({message: 'Logged out successfully'});
 };

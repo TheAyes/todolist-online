@@ -5,14 +5,16 @@ import {createTodo, deleteTodo, getAllTodos, getOneTodo, updateTodo} from "./Tod
 import * as process from "process";
 import {
 	authenticateUser,
+	getUserData,
 	handleTokenRefresh,
 	handleUserLogin,
+	handleUserLogout,
 	handleUserRegistration
 } from "./AuthenticationController.js";
 import {fileURLToPath} from "url";
 import mongoose from "mongoose";
 import {getInteractionCount, getUserCount, incrementInteractionCount} from "./StatisticsController.js";
-import {sanitizeBody} from "../SecurityController.js";
+import {sanitizeBody} from "./SecurityController.js";
 
 config();
 
@@ -59,6 +61,14 @@ app.post('/api/register', incrementInteractionCount, async (req: Request, res: R
 
 app.post('/api/refresh', async (req: Request, res: Response) => {
 	await handleTokenRefresh(req, res);
+});
+
+app.get("/api/user", authenticateUser, async (req: Request, res: Response) => {
+	await getUserData(req, res);
+});
+
+app.post("/api/logout", async (req: Request, res: Response) => {
+	await handleUserLogout(req, res);
 });
 
 app.get("/api/statistics/interactions", async (req: Request, res: Response) => {

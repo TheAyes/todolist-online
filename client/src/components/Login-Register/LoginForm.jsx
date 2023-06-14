@@ -35,6 +35,7 @@ const UserHandlingForm = ({targetEndpoint}) => {
 
 		try {
 			const response = await axios.post("/api/login", {username: lowercaseUsername, password});
+
 			localStorage.setItem("userToken", JSON.stringify(response.data));
 
 			navigate("/list")

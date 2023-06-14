@@ -33,27 +33,21 @@ const App = () => {
 	}, [location.pathname]);
 
 	useEffect(() => {
-		if (!user) {
-			const token = JSON.parse(localStorage.getItem("userToken"));
-			if (token) {
-				try {
-					axios.post("/api/refresh", {}, {headers: {"Authorization": `Bearer ${token.accessToken}`}})
-						.then(response => {
-							setUser(response.data);
-						})
-						.catch(error => {
-							console.error(error);
-						})
-				} catch (error) {
-					navigate("/login")
-				}
 
-			}
-		}
+		const token = JSON.parse(localStorage.getItem("userToken"));
+
+		const refreshToken = async () => {
+			const tokenResponse = await axios.post("/api/refresh", {}, {headers: {"Authorization": `Bearer ${token.refreshToken}`}})
+			localStorage.setItem("userToken", JSON.stringify(tokenResponse.data));
+
+			const userdataResponse = await axios.get("/api/user", {headers: {"Authorization": `Bearer ${tokenResponse.data.accessToken}`}})
+			setUser(userdataResponse.data.user);
+		};
+		refreshToken();
 	}, [])
 
 	useEffect(() => {
-		const token = JSON.parse(localStorage.getItem("userToken"));
+
 
 		const redirect = async () => {
 			if (location.pathname === "/") {
@@ -62,6 +56,12 @@ const App = () => {
 		}
 		redirect();
 	}, [location.pathname]);
+
+	useEffect(() => {
+		if (user) {
+			navigate("/list")
+		}
+	}, [user]);
 
 	return (
 		<UserContext.Provider value={{user, setUser}}>
@@ -74,9 +74,29 @@ const App = () => {
 					<div>
 						{!!user ?
 							<>
-								<button onClick={() => {
-								}}>
+								<p>
 									Logged in as {user.username}
+								</p>
+								<button onClick={() => {
+									const token = JSON.parse(localStorage.getItem("userToken"));
+									if (!token) return console.error("No token found");
+
+									axios.post(
+										"/api/logout",
+										{
+											accessToken: token.accessToken,
+											refreshToken: token.refreshToken
+										}, {
+											headers: {
+												"Authorization": `Bearer ${token.accessToken}`
+											}
+										})
+										.then(() => {
+											localStorage.removeItem("userToken");
+											setUser(null);
+											navigate("/login")
+										})
+								}}>Logout
 								</button>
 							</> :
 							<>
