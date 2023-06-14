@@ -104,7 +104,7 @@ const App = () => {
 									 rel="noopener noreferrer">TheAyes</a> ❤</p>
 					<article>
 						<p>Amount of Users: {userCount}</p>
-						<p>Total Interaction: {visitCount}</p>
+						<p>Total Interactions: {visitCount}</p>
 					</article>
 
 				</footer>
