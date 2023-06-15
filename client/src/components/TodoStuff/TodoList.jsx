@@ -61,6 +61,7 @@ const TodoList = () => {
 		try {
 			const foundIndex = todos.findIndex((item) => item.id === id);
 
+
 			const response = await axios.patch(`/api/todos/${id}?status=${!todos[foundIndex].status}`, null, {
 				headers: {
 					"Authorization": `Bearer ${userToken.accessToken}`

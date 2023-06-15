@@ -49,19 +49,20 @@ export const updateTodo = async (req: Request, res: Response) => {
 		return;
 	}
 
-	const todo = user.todos.find((todo: any) => {
+	const todoIndex = user.todos.findIndex((todo: any) => {
 		return todo.id === id;
 	});
 
-	if (!todo) {
+	if (!todoIndex) {
 		res.status(404).json({error: 'Todo not found'});
 		return;
 	}
 
-	todo.status = status === 'true';
+	user.todos[todoIndex].status = status === 'true';
+
 	await user.save();
 
-	res.json(todo);
+	res.json(user.todos[todoIndex]);
 }
 
 export const deleteTodo = async (req: Request, res: Response) => {

@@ -1,3 +1,14 @@
 .TodoItem {
+	article {
+		input[type="checkbox"] {
+			position: relative;
 
+			&:checked::after {
+				content: "✓";
+				color: #fff;
+				position: absolute;
+				inset: 0;
+			}
+		}
+	}
 }
